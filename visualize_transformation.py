@@ -166,12 +166,9 @@ def main():
     if st.sidebar.button("Apply"):
         if file_uploader is not None:
             y, sr = handle_uploaded_audio_file(file_uploader)
-        else:
-            y, sr = load_audio_sample(
-                "/Users/pascal/Documents/DeepLearning/datasets/audio/ESC-50-master/audio/1-18810-A-49.wav")
 
-        pipeline = audiomentations.Compose(create_pipeline(transformations))
-        plot_audio_transformations(y, sr, pipeline)
+            pipeline = audiomentations.Compose(create_pipeline(transformations))
+            plot_audio_transformations(y, sr, pipeline)
 
 
 if __name__ == '__main__':

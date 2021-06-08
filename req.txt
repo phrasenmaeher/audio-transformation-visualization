@@ -1,0 +1,7 @@
+librosa
+numpy
+streamlit
+matplotlib
+scipy
+audiomentations
+pydub

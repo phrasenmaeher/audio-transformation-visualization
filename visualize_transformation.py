@@ -172,5 +172,5 @@ def main():
 
 
 if __name__ == '__main__':
-    st.set_page_config(layout="wide", page_title="Audio visualization")
+    st.set_page_config(layout="wide", page_title="Audio augmentation visualization")
     main()

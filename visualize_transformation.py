@@ -29,19 +29,15 @@ def create_audio_player(audio_data, sample_rate):
 
 
 def handle_uploaded_audio_file(uploaded_file):
-    with wave.open(uploaded_file, mode="rb") as f:
-        wave_object = f
+    a = pydub.AudioSegment.from_file(file=uploaded_file, format=uploaded_file.name.split(".")[-1])
 
-    params = wave_object.getparams()
+    channel_sounds = a.split_to_mono()
+    samples = [s.get_array_of_samples() for s in channel_sounds]
 
-    a = pydub.AudioSegment.from_raw(file=uploaded_file, sample_width=params.sampwidth,
-                                    frame_rate=params.framerate, channels=params.nchannels)
-
-    samples = a.get_array_of_samples()
     fp_arr = np.array(samples).T.astype(np.float32)
-    fp_arr /= np.iinfo(samples.typecode).max
+    fp_arr /= np.iinfo(samples[0].typecode).max
 
-    return fp_arr, params.framerate
+    return fp_arr[:, 0], a.frame_rate
 
 
 def plot_wave(y, sr):
@@ -143,6 +139,21 @@ def index_to_transformation(index: int):
         return audiomentations.Gain(p=1.0)
 
 
+def action(file_uploader, selected_provided_file, transformations):
+    if file_uploader is not None:
+        y, sr = handle_uploaded_audio_file(file_uploader)
+    else:
+        if selected_provided_file == "Dog":
+            y, sr = librosa.load("samples/dog.wav")
+        elif selected_provided_file == "Cow":
+            y, sr = librosa.load("samples/cow.wav")
+        elif selected_provided_file == "Thunder":
+            y, sr = librosa.load("samples/thunder.wav")
+
+    pipeline = audiomentations.Compose(create_pipeline(transformations))
+    plot_audio_transformations(y, sr, pipeline)
+
+
 def main():
     st.sidebar.markdown("Choose the transformations here:")
     gaussian_noise = st.sidebar.checkbox("GaussianNoise")
@@ -156,19 +167,19 @@ def main():
     polarity_inversion = st.sidebar.checkbox("PolarityInversion")
     gain = st.sidebar.checkbox("Gain")
     st.sidebar.markdown("---")
-    st.sidebar.markdown("Upload an audio file:")
-    file_uploader = st.sidebar.file_uploader(label="", type=".wav")
-
-    transformations = [gaussian_noise, gaussian_noise_snr, frequency_mask, time_mask, time_strech, pitch_shift, shift,
-                       normalize, polarity_inversion, gain]
+    st.sidebar.markdown("(Optional) Upload an audio file here:")
+    file_uploader = st.sidebar.file_uploader(label="", type=[".wav", ".wave", ".flac", ".mp3", ".ogg"])
+    st.sidebar.markdown("Or select a sample file here:")
+    selected_provided_file = st.sidebar.selectbox(label="", options=["Cow", "Dog", "Thunder"])
 
     st.sidebar.markdown("---")
     if st.sidebar.button("Apply"):
-        if file_uploader is not None:
-            y, sr = handle_uploaded_audio_file(file_uploader)
+        transformations = [gaussian_noise, gaussian_noise_snr, frequency_mask, time_mask, time_strech, pitch_shift,
+                           shift,
+                           normalize, polarity_inversion, gain]
 
-            pipeline = audiomentations.Compose(create_pipeline(transformations))
-            plot_audio_transformations(y, sr, pipeline)
+        action(file_uploader=file_uploader, selected_provided_file=selected_provided_file,
+               transformations=transformations)
 
 
 if __name__ == '__main__':

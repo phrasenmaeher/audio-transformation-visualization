@@ -155,6 +155,12 @@ def action(file_uploader, selected_provided_file, transformations):
 
 
 def main():
+    placeholder = st.empty()
+    placeholder.markdown("# Visualize an audio pipeline\n"
+                         "### Select the components of the pipeline in the sidebar.\n"
+                         "Once you have chosen augmentation techniques, select or upload an audio file\n. "
+                         "Then click \"Apply\" to start!")
+    #placeholder.write("Create your audio pipeline by selecting augmentations in the sidebar.")
     st.sidebar.markdown("Choose the transformations here:")
     gaussian_noise = st.sidebar.checkbox("GaussianNoise")
     gaussian_noise_snr = st.sidebar.checkbox("GaussianNoise with random SNR")
@@ -174,6 +180,7 @@ def main():
 
     st.sidebar.markdown("---")
     if st.sidebar.button("Apply"):
+        placeholder.empty()
         transformations = [gaussian_noise, gaussian_noise_snr, frequency_mask, time_mask, time_strech, pitch_shift,
                            shift,
                            normalize, polarity_inversion, gain]

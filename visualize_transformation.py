@@ -142,7 +142,7 @@ def index_to_transformation(index: int):
     elif index == 11:
         return audiomentations.AddShortNoises(sounds_path="background_noise", p=1.0)
     elif index == 12:
-        return audiomentations.ClippingDistortion(p=1.0)
+        return audiomentations.ClippingDistortion(max_percentile_threshold=10, p=1.0)
 
 
 def action(file_uploader, selected_provided_file, transformations):

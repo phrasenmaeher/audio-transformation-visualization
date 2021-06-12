@@ -137,6 +137,12 @@ def index_to_transformation(index: int):
         return audiomentations.PolarityInversion(p=1.0)
     elif index == 9:
         return audiomentations.Gain(p=1.0)
+    elif index == 10:
+        return audiomentations.AddBackgroundNoise(sounds_path="background_noise", p=1.0)
+    elif index == 11:
+        return audiomentations.AddShortNoises(sounds_path="background_noise", p=1.0)
+    elif index == 12:
+        return audiomentations.ClippingDistortion(p=1.0)
 
 
 def action(file_uploader, selected_provided_file, transformations):
@@ -156,11 +162,14 @@ def action(file_uploader, selected_provided_file, transformations):
 
 def main():
     placeholder = st.empty()
+    placeholder2 = st.empty()
     placeholder.markdown("# Visualize an audio pipeline\n"
                          "### Select the components of the pipeline in the sidebar.\n"
                          "Once you have chosen augmentation techniques, select or upload an audio file\n. "
-                         "Then click \"Apply\" to start!")
-    #placeholder.write("Create your audio pipeline by selecting augmentations in the sidebar.")
+                         "Then click \"Apply\" to start!\n ")
+    placeholder2.markdown(
+        "After clicking start, the individual steps of the pipeline are visualized. The ouput of the previous step is the input to the next step.")
+    # placeholder.write("Create your audio pipeline by selecting augmentations in the sidebar.")
     st.sidebar.markdown("Choose the transformations here:")
     gaussian_noise = st.sidebar.checkbox("GaussianNoise")
     gaussian_noise_snr = st.sidebar.checkbox("GaussianNoise with random SNR")
@@ -172,6 +181,10 @@ def main():
     normalize = st.sidebar.checkbox("(Peak-)Normalize")
     polarity_inversion = st.sidebar.checkbox("PolarityInversion")
     gain = st.sidebar.checkbox("Gain")
+    background_noise = st.sidebar.checkbox("AddBackgroundNoise", help="Adds a random background noise")
+    add_short_noises = st.sidebar.checkbox("AddShortNoises", help="Mixes bursts of random sounds into the audio signal")
+    clipping_distortion = st.sidebar.checkbox("ClippingDistortion")
+
     st.sidebar.markdown("---")
     st.sidebar.markdown("(Optional) Upload an audio file here:")
     file_uploader = st.sidebar.file_uploader(label="", type=[".wav", ".wave", ".flac", ".mp3", ".ogg"])
@@ -181,9 +194,10 @@ def main():
     st.sidebar.markdown("---")
     if st.sidebar.button("Apply"):
         placeholder.empty()
+        placeholder2.empty()
         transformations = [gaussian_noise, gaussian_noise_snr, frequency_mask, time_mask, time_strech, pitch_shift,
                            shift,
-                           normalize, polarity_inversion, gain]
+                           normalize, polarity_inversion, gain, background_noise, add_short_noises, clipping_distortion]
 
         action(file_uploader=file_uploader, selected_provided_file=selected_provided_file,
                transformations=transformations)

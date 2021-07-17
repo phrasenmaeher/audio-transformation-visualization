@@ -120,7 +120,7 @@ def index_to_transformation(index: int):
     if index == 0:
         return audiomentations.AddGaussianNoise(p=1.0)
     elif index == 1:
-        return audiomentations.AddGaussianSNR(p=1.0)
+        return audiomentations.AddGaussianSNR(p=1.0,  min_snr_in_db=30, max_snr_in_db=90)
     elif index == 2:
         return audiomentations.FrequencyMask(p=1.0)
     elif index == 3:

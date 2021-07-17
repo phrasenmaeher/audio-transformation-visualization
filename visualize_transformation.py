@@ -143,6 +143,8 @@ def index_to_transformation(index: int):
         return audiomentations.AddShortNoises(sounds_path="background_noise", p=1.0)
     elif index == 12:
         return audiomentations.ClippingDistortion(max_percentile_threshold=10, p=1.0)
+    elif index == 13:
+        return audiomentations.Clip(p=1.0)
 
 
 def action(file_uploader, selected_provided_file, transformations):
@@ -184,6 +186,7 @@ def main():
     background_noise = st.sidebar.checkbox("AddBackgroundNoise", help="Adds a random background noise")
     add_short_noises = st.sidebar.checkbox("AddShortNoises", help="Mixes bursts of random sounds into the audio signal")
     clipping_distortion = st.sidebar.checkbox("ClippingDistortion")
+    clip = st.sidebar.checkbox("Clip")
 
     st.sidebar.markdown("---")
     st.sidebar.markdown("(Optional) Upload an audio file here:")
@@ -197,7 +200,7 @@ def main():
         placeholder2.empty()
         transformations = [gaussian_noise, gaussian_noise_snr, frequency_mask, time_mask, time_strech, pitch_shift,
                            shift,
-                           normalize, polarity_inversion, gain, background_noise, add_short_noises, clipping_distortion]
+                           normalize, polarity_inversion, gain, background_noise, add_short_noises, clipping_distortion, clip]
 
         action(file_uploader=file_uploader, selected_provided_file=selected_provided_file,
                transformations=transformations)

@@ -120,7 +120,7 @@ def index_to_transformation(index: int):
     if index == 0:
         return audiomentations.AddGaussianNoise(p=1.0)
     elif index == 1:
-        return audiomentations.AddGaussianSNR(p=1.0,  min_snr_in_db=30, max_snr_in_db=90)
+        return audiomentations.AddGaussianSNR(p=1.0, min_snr_in_db=30, max_snr_in_db=90)
     elif index == 2:
         return audiomentations.FrequencyMask(p=1.0)
     elif index == 3:
@@ -145,6 +145,14 @@ def index_to_transformation(index: int):
         return audiomentations.ClippingDistortion(max_percentile_threshold=10, p=1.0)
     elif index == 13:
         return audiomentations.Clip(p=1.0)
+    elif index == 14:
+        return audiomentations.HighPassFilter(p=1.0)
+    elif index == 15:
+        return audiomentations.LowPassFilter(p=1.0)
+    elif index == 16:
+        return audiomentations.BandPassFilter(p=1.0)
+    elif index == 17:
+        return audiomentations.Reverse(p=1.0)
 
 
 def action(file_uploader, selected_provided_file, transformations):
@@ -187,6 +195,12 @@ def main():
     add_short_noises = st.sidebar.checkbox("AddShortNoises", help="Mixes bursts of random sounds into the audio signal")
     clipping_distortion = st.sidebar.checkbox("ClippingDistortion")
     clip = st.sidebar.checkbox("Clip")
+    highpass = st.sidebar.checkbox("HighPassFilter")
+    lowpass = st.sidebar.checkbox("LowPassFilter")
+    bandpass = st.sidebar.checkbox("BandPassFilter")
+    reverse = st.sidebar.checkbox("Reverse")
+
+
 
     st.sidebar.markdown("---")
     st.sidebar.markdown("(Optional) Upload an audio file here:")
@@ -199,8 +213,8 @@ def main():
         placeholder.empty()
         placeholder2.empty()
         transformations = [gaussian_noise, gaussian_noise_snr, frequency_mask, time_mask, time_strech, pitch_shift,
-                           shift,
-                           normalize, polarity_inversion, gain, background_noise, add_short_noises, clipping_distortion, clip]
+                           shift, normalize, polarity_inversion, gain, background_noise, add_short_noises,
+                           clipping_distortion, clip, highpass, lowpass, bandpass, reverse]
 
         action(file_uploader=file_uploader, selected_provided_file=selected_provided_file,
                transformations=transformations)

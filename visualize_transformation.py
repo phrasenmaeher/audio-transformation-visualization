@@ -65,7 +65,7 @@ def spacing():
 def plot_audio_transformations(y, sr, pipeline: audiomentations.Compose):
     cols = [1, 1, 1]
 
-    col1, col2, col3 = st.beta_columns(cols)
+    col1, col2, col3 = st.columns(cols)
     with col1:
         st.markdown(f"<h4 style='text-align: center; color: black;'>Original</h5>",
                     unsafe_allow_html=True)
@@ -89,7 +89,7 @@ def plot_audio_transformations(y, sr, pipeline: audiomentations.Compose):
         fig = plot_transformation(modified, sr, transformation_name=transformation_name)
         y = modified
 
-        col1, col2, col3 = st.beta_columns(cols)
+        col1, col2, col3 = st.columns(cols)
 
         with col1:
             st.markdown(f"<h4 style='text-align: center; color: black;'>{transformation_name}</h5>",

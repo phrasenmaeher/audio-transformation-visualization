@@ -29,7 +29,9 @@ def create_audio_player(audio_data, sample_rate):
 
 
 def handle_uploaded_audio_file(uploaded_file):
-    a = pydub.AudioSegment.from_file(file=uploaded_file, format=uploaded_file.name.split(".")[-1])
+    a = pydub.AudioSegment.from_file(
+        file=uploaded_file, format=uploaded_file.name.split(".")[-1]
+    )
 
     channel_sounds = a.split_to_mono()
     samples = [s.get_array_of_samples() for s in channel_sounds]
@@ -42,7 +44,8 @@ def handle_uploaded_audio_file(uploaded_file):
 
 def plot_wave(y, sr):
     fig, ax = plt.subplots()
-    img = librosa.display.waveplot(y, sr=sr, x_axis='time', ax=ax)
+
+    img = librosa.display.waveshow(y, sr=sr, x_axis="time", ax=ax)
 
     return plt.gcf()
 
@@ -51,7 +54,7 @@ def plot_transformation(y, sr, transformation_name):
     D = librosa.stft(y)  # STFT of y
     S_db = librosa.amplitude_to_db(np.abs(D), ref=np.max)
     fig, ax = plt.subplots()
-    img = librosa.display.specshow(S_db, x_axis='time', y_axis='linear', ax=ax)
+    img = librosa.display.specshow(S_db, x_axis="time", y_axis="linear", ax=ax)
     # ax.set(title=transformation_name)
     fig.colorbar(img, ax=ax, format="%+2.f dB")
 
@@ -67,16 +70,22 @@ def plot_audio_transformations(y, sr, pipeline: audiomentations.Compose):
 
     col1, col2, col3 = st.columns(cols)
     with col1:
-        st.markdown(f"<h4 style='text-align: center; color: black;'>Original</h5>",
-                    unsafe_allow_html=True)
+        st.markdown(
+            f"<h4 style='text-align: center; color: black;'>Original</h5>",
+            unsafe_allow_html=True,
+        )
         st.pyplot(plot_transformation(y, sr, "Original"))
     with col2:
-        st.markdown(f"<h4 style='text-align: center; color: black;'>Wave plot </h5>",
-                    unsafe_allow_html=True)
+        st.markdown(
+            f"<h4 style='text-align: center; color: black;'>Wave plot </h5>",
+            unsafe_allow_html=True,
+        )
         st.pyplot(plot_wave(y, sr))
     with col3:
-        st.markdown(f"<h4 style='text-align: center; color: black;'>Audio</h5>",
-                    unsafe_allow_html=True)
+        st.markdown(
+            f"<h4 style='text-align: center; color: black;'>Audio</h5>",
+            unsafe_allow_html=True,
+        )
         spacing()
         st.audio(create_audio_player(y, sr))
     st.markdown("---")
@@ -84,7 +93,9 @@ def plot_audio_transformations(y, sr, pipeline: audiomentations.Compose):
     y = y
     sr = sr
     for col_index, individual_transformation in enumerate(pipeline.transforms):
-        transformation_name = str(type(individual_transformation)).split("'")[1].split(".")[-1]
+        transformation_name = (
+            str(type(individual_transformation)).split("'")[1].split(".")[-1]
+        )
         modified = individual_transformation(y, sr)
         fig = plot_transformation(modified, sr, transformation_name=transformation_name)
         y = modified
@@ -92,18 +103,24 @@ def plot_audio_transformations(y, sr, pipeline: audiomentations.Compose):
         col1, col2, col3 = st.columns(cols)
 
         with col1:
-            st.markdown(f"<h4 style='text-align: center; color: black;'>{transformation_name}</h5>",
-                        unsafe_allow_html=True)
+            st.markdown(
+                f"<h4 style='text-align: center; color: black;'>{transformation_name}</h5>",
+                unsafe_allow_html=True,
+            )
             st.pyplot(fig)
         with col2:
-            st.markdown(f"<h4 style='text-align: center; color: black;'>Wave plot </h5>",
-                        unsafe_allow_html=True)
+            st.markdown(
+                f"<h4 style='text-align: center; color: black;'>Wave plot </h5>",
+                unsafe_allow_html=True,
+            )
             st.pyplot(plot_wave(modified, sr))
             spacing()
 
         with col3:
-            st.markdown(f"<h4 style='text-align: center; color: black;'>Audio</h5>",
-                        unsafe_allow_html=True)
+            st.markdown(
+                f"<h4 style='text-align: center; color: black;'>Audio</h5>",
+                unsafe_allow_html=True,
+            )
             spacing()
             st.audio(create_audio_player(modified, sr))
         st.markdown("---")
@@ -153,6 +170,14 @@ def index_to_transformation(index: int):
         return audiomentations.BandPassFilter(p=1.0)
     elif index == 17:
         return audiomentations.Reverse(p=1.0)
+    elif index == 18:
+        return audiomentations.BandStopFilter(p=1.0)
+    elif index == 19:
+        return audiomentations.PeakingFilter(p=1.0)
+    elif index == 20:
+        return audiomentations.LowShelfFilter(p=1.0)
+    elif index == 21:
+        return audiomentations.HighShelfFilter(p=1.0)
 
 
 def action(file_uploader, selected_provided_file, transformations):
@@ -173,12 +198,15 @@ def action(file_uploader, selected_provided_file, transformations):
 def main():
     placeholder = st.empty()
     placeholder2 = st.empty()
-    placeholder.markdown("# Visualize an audio pipeline\n"
-                         "### Select the components of the pipeline in the sidebar.\n"
-                         "Once you have chosen augmentation techniques, select or upload an audio file\n. "
-                         "Then click \"Apply\" to start!\n ")
+    placeholder.markdown(
+        "# Visualize an audio pipeline\n"
+        "### Select the components of the pipeline in the sidebar.\n"
+        "Once you have chosen augmentation techniques, select or upload an audio file\n. "
+        'Then click "Apply" to start!\n '
+    )
     placeholder2.markdown(
-        "After clicking start, the individual steps of the pipeline are visualized. The ouput of the previous step is the input to the next step.")
+        "After clicking start, the individual steps of the pipeline are visualized. The ouput of the previous step is the input to the next step."
+    )
     # placeholder.write("Create your audio pipeline by selecting augmentations in the sidebar.")
     st.sidebar.markdown("Choose the transformations here:")
     gaussian_noise = st.sidebar.checkbox("GaussianNoise")
@@ -191,35 +219,69 @@ def main():
     normalize = st.sidebar.checkbox("(Peak-)Normalize")
     polarity_inversion = st.sidebar.checkbox("PolarityInversion")
     gain = st.sidebar.checkbox("Gain")
-    background_noise = st.sidebar.checkbox("AddBackgroundNoise", help="Adds a random background noise")
-    add_short_noises = st.sidebar.checkbox("AddShortNoises", help="Mixes bursts of random sounds into the audio signal")
+    background_noise = st.sidebar.checkbox(
+        "AddBackgroundNoise", help="Adds a random background noise"
+    )
+    add_short_noises = st.sidebar.checkbox(
+        "AddShortNoises", help="Mixes bursts of random sounds into the audio signal"
+    )
     clipping_distortion = st.sidebar.checkbox("ClippingDistortion")
     clip = st.sidebar.checkbox("Clip")
     highpass = st.sidebar.checkbox("HighPassFilter")
     lowpass = st.sidebar.checkbox("LowPassFilter")
     bandpass = st.sidebar.checkbox("BandPassFilter")
     reverse = st.sidebar.checkbox("Reverse")
-
-
+    bandstop = st.sidebar.checkbox("BandStopFilter")
+    peaking = st.sidebar.checkbox("PeakingFilter")
+    lowshelf = st.sidebar.checkbox("LowShelfFilter")
+    highshelf = st.sidebar.checkbox("HighShelfFilter")
 
     st.sidebar.markdown("---")
     st.sidebar.markdown("(Optional) Upload an audio file here:")
-    file_uploader = st.sidebar.file_uploader(label="", type=[".wav", ".wave", ".flac", ".mp3", ".ogg"])
+    file_uploader = st.sidebar.file_uploader(
+        label="", type=[".wav", ".wave", ".flac", ".mp3", ".ogg"]
+    )
     st.sidebar.markdown("Or select a sample file here:")
-    selected_provided_file = st.sidebar.selectbox(label="", options=["Cow", "Dog", "Thunder"])
+    selected_provided_file = st.sidebar.selectbox(
+        label="", options=["Cow", "Dog", "Thunder"]
+    )
 
     st.sidebar.markdown("---")
     if st.sidebar.button("Apply"):
         placeholder.empty()
         placeholder2.empty()
-        transformations = [gaussian_noise, gaussian_noise_snr, frequency_mask, time_mask, time_strech, pitch_shift,
-                           shift, normalize, polarity_inversion, gain, background_noise, add_short_noises,
-                           clipping_distortion, clip, highpass, lowpass, bandpass, reverse]
+        transformations = [
+            gaussian_noise,
+            gaussian_noise_snr,
+            frequency_mask,
+            time_mask,
+            time_strech,
+            pitch_shift,
+            shift,
+            normalize,
+            polarity_inversion,
+            gain,
+            background_noise,
+            add_short_noises,
+            clipping_distortion,
+            clip,
+            highpass,
+            lowpass,
+            bandpass,
+            reverse,
+            bandstop,
+            peaking,
+            lowshelf,
+            highshelf
+        ]
 
-        action(file_uploader=file_uploader, selected_provided_file=selected_provided_file,
-               transformations=transformations)
+        action(
+            file_uploader=file_uploader,
+            selected_provided_file=selected_provided_file,
+            transformations=transformations,
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     st.set_page_config(layout="wide", page_title="Audio augmentation visualization")
     main()

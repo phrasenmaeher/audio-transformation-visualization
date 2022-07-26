@@ -28,6 +28,7 @@ def create_audio_player(audio_data, sample_rate):
     return virtualfile
 
 
+@st.cache
 def handle_uploaded_audio_file(uploaded_file):
     a = pydub.AudioSegment.from_file(
         file=uploaded_file, format=uploaded_file.name.split(".")[-1]
@@ -42,6 +43,7 @@ def handle_uploaded_audio_file(uploaded_file):
     return fp_arr[:, 0], a.frame_rate
 
 
+@st.cache
 def plot_wave(y, sr):
     fig, ax = plt.subplots()
 
@@ -50,7 +52,8 @@ def plot_wave(y, sr):
     return plt.gcf()
 
 
-def plot_transformation(y, sr, transformation_name):
+@st.cache
+def plot_transformation(y):
     D = librosa.stft(y)  # STFT of y
     S_db = librosa.amplitude_to_db(np.abs(D), ref=np.max)
     fig, ax = plt.subplots()

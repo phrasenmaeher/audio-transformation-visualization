@@ -6,7 +6,6 @@ import audiomentations
 from matplotlib import pyplot as plt
 import librosa.display
 from scipy.io import wavfile
-import wave
 import pydub
 
 plt.rcParams["figure.figsize"] = (10, 7)
@@ -43,7 +42,6 @@ def handle_uploaded_audio_file(uploaded_file):
     return fp_arr[:, 0], a.frame_rate
 
 
-@st.cache
 def plot_wave(y, sr):
     fig, ax = plt.subplots()
 
@@ -52,13 +50,12 @@ def plot_wave(y, sr):
     return plt.gcf()
 
 
-@st.cache
-def plot_transformation(y):
+def plot_transformation(y, sr, transformation_name):
     D = librosa.stft(y)  # STFT of y
     S_db = librosa.amplitude_to_db(np.abs(D), ref=np.max)
     fig, ax = plt.subplots()
-    img = librosa.display.specshow(S_db, x_axis="time", y_axis="linear", ax=ax)
-    # ax.set(title=transformation_name)
+    img = librosa.display.specshow(S_db, x_axis='time', y_axis='linear', ax=ax)
+    ax.set(title=transformation_name)
     fig.colorbar(img, ax=ax, format="%+2.f dB")
 
     return plt.gcf()
@@ -181,6 +178,18 @@ def index_to_transformation(index: int):
         return audiomentations.LowShelfFilter(p=1.0)
     elif index == 21:
         return audiomentations.HighShelfFilter(p=1.0)
+    elif index == 22:
+        return audiomentations.GainTransition(p=1.0)
+    elif index == 23:
+        return audiomentations.RoomSimulator(p=1.0)
+    elif index == 24:
+        return audiomentations.Padding(p=1.0)
+    elif index == 25:
+        return audiomentations.SevenBandParametricEQ(p=1.0)
+    elif index == 26:
+        return audiomentations.AirAbsorption(p=1.0)
+    elif index == 27:
+        return audiomentations.Limiter(p=1.0)
 
 
 def action(file_uploader, selected_provided_file, transformations):
@@ -205,7 +214,8 @@ def main():
         "# Visualize an audio pipeline\n"
         "### Select the components of the pipeline in the sidebar.\n"
         "Once you have chosen augmentation techniques, select or upload an audio file\n. "
-        'Then click "Apply" to start!\n '
+        'Then click "Apply" to start! \n\n'
+        'For more information see the corresponding [blog post](https://towardsdatascience.com/visualizing-audio-pipelines-with-streamlit-96525781b5d9) and check out [the source code on GitHub](https://github.com/phrasenmaeher/audio-transformation-visualization).'
     )
     placeholder2.markdown(
         "After clicking start, the individual steps of the pipeline are visualized. The ouput of the previous step is the input to the next step."
@@ -238,6 +248,12 @@ def main():
     peaking = st.sidebar.checkbox("PeakingFilter")
     lowshelf = st.sidebar.checkbox("LowShelfFilter")
     highshelf = st.sidebar.checkbox("HighShelfFilter")
+    gain_transition = st.sidebar.checkbox("GainTransition")
+    room_simulator = st.sidebar.checkbox("RoomSimulator")
+    padding = st.sidebar.checkbox("Padding")
+    seven_band_eq = st.sidebar.checkbox("SevenBandParametricEQ")
+    air_absorption = st.sidebar.checkbox("AirAbsorption")
+    limiter = st.sidebar.checkbox("Limiter")
 
     st.sidebar.markdown("---")
     st.sidebar.markdown("(Optional) Upload an audio file here:")
@@ -275,7 +291,14 @@ def main():
             bandstop,
             peaking,
             lowshelf,
-            highshelf
+            highshelf,
+            gain_transition,
+            room_simulator,
+            padding,
+            seven_band_eq,
+            air_absorption,
+            limiter,
+
         ]
 
         action(

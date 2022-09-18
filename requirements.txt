@@ -1,7 +1,10 @@
 librosa
 numpy
-streamlit==1.10.0
+streamlit==1.12.2
 matplotlib
 scipy
 audiomentations
 pydub
+pyroomacoustics
+cylimiter
+
